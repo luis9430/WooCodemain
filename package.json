@@ -1,0 +1,36 @@
+{
+    "name": "mi-plugin",
+    "version": "1.0.0",
+    "description": "Plugin de WordPress con Vue y PrimeVue",
+    "scripts": {
+        "dev": "webpack --mode development --watch",
+        "build": "webpack --mode production"
+    },
+    "dependencies": {
+        "@primeuix/themes": "^1.0.3",
+        "primeicons": "^6.0.1",
+        "primevue": "^4.3.3",
+        "tailwindcss-primeui": "^0.6.1",
+        "vue": "^3.5.13"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.22.5",
+        "@babel/preset-env": "^7.22.5",
+        "@primevue/auto-import-resolver": "^4.3.3",
+        "@primevue/forms": "^4.3.3",
+        "@tailwindcss/postcss": "^4.1.4",
+        "@vue/compiler-sfc": "^3.3.4",
+        "babel-loader": "^9.1.2",
+        "css-loader": "^6.11.0",
+        "file-loader": "^6.2.0",
+        "mini-css-extract-plugin": "^2.7.6",
+        "postcss-loader": "^8.1.1",
+        "primeicons": "latest",
+        "sass": "^1.86.3",
+        "sass-loader": "^16.0.5",
+        "style-loader": "^3.3.4",
+        "vue-loader": "^17.3.1",
+        "webpack": "^5.99.6",
+        "webpack-cli": "^5.1.4"
+    }
+}
