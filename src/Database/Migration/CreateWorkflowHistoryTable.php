@@ -1,19 +1,14 @@
 <?php
 namespace App\Database\Migration;
 
-/**
- * Migración para crear tabla de historial de workflow
- */
-class CreateWorkflowHistoryTable {
-    /**
-     * Ejecutar migración
-     */
-    public function up() {
+class CreateWorkflowHistoryTable extends AbstractMigration
+{
+    public function up()
+    {
         global $wpdb;
         $table_name = $wpdb->prefix . 'workflow_history';
-        
         $charset_collate = $wpdb->get_charset_collate();
-        
+
         $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             object_id bigint(20) NOT NULL,
@@ -29,18 +24,15 @@ class CreateWorkflowHistoryTable {
             KEY object_id (object_id),
             KEY workflow (workflow)
         ) $charset_collate;";
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
-    }
     
-    /**
-     * Revertir migración
-     */
-    public function down() {
+    }
+
+    public function down()
+    {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'workflow_history';
-        
-        $wpdb->query("DROP TABLE IF EXISTS $table_name");
+        $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}workflow_history");
     }
 }
