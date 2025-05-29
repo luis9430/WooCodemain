@@ -9,6 +9,8 @@ use Symfony\Component\Workflow\Registry as SymfonyRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use App\Workflow\Config\OrderWorkflow;
 use App\Workflow\Subscriber\OrderWorkflowSubscriber;
+use Symfony\Component\Workflow\StateMachine;
+
 use App\Core\Container;
 
 class Registry {

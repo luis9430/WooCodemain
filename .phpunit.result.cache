@@ -1,0 +1,1 @@
+{"version":1,"defects":{"WooCodePlugin\\Tests\\Workflow\\Config\\OrderWorkflowDefinitionTest::testGetDefinitionCreatesValidDefinition":8},"times":{"WooCodePlugin\\Tests\\Workflow\\Config\\OrderWorkflowDefinitionTest::testGetDefinitionCreatesValidDefinition":0.012,"WooCodePlugin\\Tests\\Workflow\\Config\\OrderWorkflowDefinitionTest::testGetNameReturnsCorrectName":0}}
