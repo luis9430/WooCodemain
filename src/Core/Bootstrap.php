@@ -1,12 +1,14 @@
 <?php
-namespace App\Core;
+namespace WooCodePlugin\Core;
 
-use App\Controller\AdminController;
-use App\PostType\ProductPostType;
-use App\Taxonomy\ProductCategory;
-use App\Database\Migration\Migrator;
-use App\Database\Migration\CreateWorkflowHistoryTable;
-use App\Workflow\Registry;
+
+use WooCodePlugin\Core\Container;
+use WooCodePlugin\Controller\AdminController;
+use WooCodePlugin\PostType\ProductPostType;
+use WooCodePlugin\Taxonomy\ProductCategory;
+use WooCodePlugin\Database\Migration\Migrator;
+use ApWooCodePluginp\Database\Migration\CreateWorkflowHistoryTable;
+use WooCodePlugin\Workflow\Registry;
 
 /**
  * Inicialización del Plugin

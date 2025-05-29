@@ -11,13 +11,17 @@
  */
 
 // Si este archivo es llamado directamente, abortar.
-if (!defined('WPINC')) {
+if (!defined('WPINC')) { // Es más común usar WPINC o ABSPATH aquí
     die;
 }
 
 // Definir constantes del plugin
 if (!defined('MI_PLUGIN_VERSION')) {
     define('MI_PLUGIN_VERSION', '1.0.0');
+}
+// __FILE__ en el archivo raíz apunta a este mismo archivo.
+if (!defined('MI_PLUGIN_FILE')) {
+    define('MI_PLUGIN_FILE', __FILE__);
 }
 if (!defined('MI_PLUGIN_PATH')) {
     define('MI_PLUGIN_PATH', plugin_dir_path(__FILE__));
@@ -27,74 +31,75 @@ if (!defined('MI_PLUGIN_URL')) {
 }
 
 // Autoload con Composer
-// Es crucial que esto se cargue ANTES de intentar usar cualquier clase con namespace.
 if (file_exists(MI_PLUGIN_PATH . 'vendor/autoload.php')) {
     require_once MI_PLUGIN_PATH . 'vendor/autoload.php';
 } else {
-    // Es una buena práctica notificar al administrador si el autoloader no está.
     add_action('admin_notices', function() {
-        echo '<div class="error"><p>El plugin "Mi Plugin Avanzado" requiere que ejecutes "composer install". El archivo autoload no se encuentra.</p></div>';
+        echo '<div class="error"><p>El plugin "Mi Plugin Avanzado" no puede encontrar el autoloader de Composer. Por favor, ejecuta "composer install" en el directorio del plugin: ' . esc_html(MI_PLUGIN_PATH) . '</p></div>';
     });
-    return; // Detener la ejecución si el autoloader no está.
+    return;
 }
 
 // Importar las clases que vas a usar con su namespace completo y correcto.
-use WooCodePlugin\Core\Plugin as PluginCore; // Usamos un alias para evitar conflicto si tuvieras una clase global Plugin
+// Es buena práctica usar un alias si el nombre de la clase es común como 'Plugin'.
+use WooCodePlugin\Core\Plugin as PluginCore;
 use WooCodePlugin\Core\Bootstrap;
 
 /**
  * La función principal que inicializa y ejecuta el plugin.
- * Es buena práctica darle un prefijo único para evitar colisiones con otros plugins/temas.
+ * Dale un prefijo único a esta función.
  */
-function woocode_main_run_plugin() {
-    // Verificar si las clases existen antes de instanciarlas, como una medida de seguridad adicional.
+function mi_avanzado_plugin_run() {
+    // Verificar si las clases existen antes de instanciarlas.
     if (!class_exists(PluginCore::class)) {
-        // Loguear o mostrar un error si la clase principal del plugin no se encuentra.
-        // Esto podría indicar un problema con el autoloader o el namespace.
-        error_log('Error: La clase WooCodePlugin\Core\Plugin no se encuentra.');
+        error_log('Error Crítico: La clase principal del plugin (WooCodePlugin\Core\Plugin) no se encuentra. Verifica el autoloader y los namespaces.');
         return;
     }
     if (!class_exists(Bootstrap::class)) {
-        error_log('Error: La clase WooCodePlugin\Core\Bootstrap no se encuentra.');
+        error_log('Error Crítico: La clase Bootstrap (WooCodePlugin\Core\Bootstrap) no se encuentra. Verifica el autoloader y los namespaces.');
         return;
     }
 
-    // Inicializar el plugin
-    // Asumiendo que tu clase WooCodePlugin\Core\Plugin tiene un constructor que no requiere argumentos,
-    // o un método estático para obtener la instancia (ej. getInstance()).
-    // Si tu clase PluginCore (src/Core/Plugin.php) es la que tiene la lógica principal y el contenedor:
-    $pluginInstance = new PluginCore(); // O PluginCore::getInstance() si es un singleton
+    try {
+        // Inicializar la clase principal del plugin (de src/Core/Plugin.php)
+        $pluginCoreInstance = new PluginCore(); // Esta es tu clase con el contenedor Symfony
+        
+        // Inicializar el bootstrap, pasándole la instancia de PluginCore
+        $bootstrap = new Bootstrap($pluginCoreInstance);
+        $bootstrap->init();
 
-    // Inicializar el bootstrap
-    // Asumiendo que Bootstrap espera una instancia de tu clase PluginCore
-    $bootstrap = new Bootstrap($pluginInstance->get_container()); // Si Bootstrap necesita el contenedor
-    // O si Bootstrap necesita la instancia de PluginCore:
-    // $bootstrap = new Bootstrap($pluginInstance);
-    $bootstrap->init(); // Asegúrate de que este método exista en tu clase Bootstrap
+    } catch (\Throwable $e) {
+        error_log('Error al inicializar Mi Plugin Avanzado: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
+        add_action('admin_notices', function() use ($e) {
+            echo '<div class="error"><p>Ocurrió un error al inicializar "Mi Plugin Avanzado": ' . esc_html($e->getMessage()) . '</p></div>';
+        });
+    }
 }
 
 /**
  * Hook para ejecutar el plugin cuando WordPress se haya cargado completamente
  * y todos los plugins estén cargados.
  */
-add_action('plugins_loaded', 'woocode_main_run_plugin');
+add_action('plugins_loaded', 'mi_avanzado_plugin_run');
 
-// Opcional: Hooks de activación y desactivación
-function woocode_main_activate_plugin() {
-    // Código a ejecutar en la activación (ej. crear tablas, flush rewrite rules)
-    // Asegúrate de que el autoloader esté disponible aquí también si necesitas tus clases.
+// Hooks de activación y desactivación (opcional pero recomendado)
+function mi_avanzado_plugin_activate() {
+    // Incluir autoloader por si no está cargado aún en este contexto
     if (file_exists(MI_PLUGIN_PATH . 'vendor/autoload.php')) {
         require_once MI_PLUGIN_PATH . 'vendor/autoload.php';
-        // Ejemplo: \WooCodePlugin\Database\MigrationRunner::runActivations();
     }
+    // Es mejor obtener el bootstrap e invocar su método activate si la lógica es compleja
+    // Pero para ello necesitarías instanciar PluginCore y Bootstrap aquí también, o tener un método estático
+    // Por ahora, puedes poner lógica simple aquí o llamar a un método estático si lo tienes.
+    // Ejemplo, si el método activate en Bootstrap es estático o no depende de la instancia:
+    // if (class_exists(\WooCodePlugin\Core\Bootstrap::class)) {
+    //     \WooCodePlugin\Core\Bootstrap::activate_plugin_logic();
+    // }
+    flush_rewrite_rules();
 }
-register_activation_hook(__FILE__, 'woocode_main_activate_plugin');
+register_activation_hook(MI_PLUGIN_FILE, 'mi_avanzado_plugin_activate');
 
-function woocode_main_deactivate_plugin() {
-    // Código a ejecutar en la desactivación
-    if (file_exists(MI_PLUGIN_PATH . 'vendor/autoload.php')) {
-        require_once MI_PLUGIN_PATH . 'vendor/autoload.php';
-        // Ejemplo: \WooCodePlugin\Database\MigrationRunner::runDeactivations();
-    }
+function mi_avanzado_plugin_deactivate() {
+    flush_rewrite_rules();
 }
-register_deactivation_hook(__FILE__, 'woocode_main_deactivate_plugin');
+register_deactivation_hook(MI_PLUGIN_FILE, 'mi_avanzado_plugin_deactivate');

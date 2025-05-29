@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import Diagnostic from './pages/Workflows/WorkflowDiagnostic.vue';
+import Diagnostic from './pages/Workflows/WorkflowDashboard.vue';
 
 import PrimeVue from 'primevue/config';
 import 'primeicons/primeicons.css';
@@ -28,4 +28,4 @@ function mountIfExists(id, component) {
 }
 
 mountIfExists('app', App);
-mountIfExists('workflow-diagnostic', Diagnostic);
+mountIfExists('workflow-dashboard', Diagnostic);
